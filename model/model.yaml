@@ -1,15 +1,15 @@
-id: https://ce-rise-models.codeberg.page/dpp-record-custody/
-name: dpp_record_custody
-title: CE-RISE DPP Record Custody Data Model
+id: https://ce-rise-models.codeberg.page/dp-record-custody/
+name: dp_record_custody
+title: CE-RISE DP Record Custody Data Model
 description: >
-    Chain of custody and governance history of DPP records, capturing who did what when.
+    Chain of custody and governance history of DPP and DMP records, capturing who did what when.
     Stage 1 focuses on Custody Events tracking with full audit trail capabilities.
 license: CC BY-NC 4.0
-version: 0.0.1
+version: 0.0.3
 
 prefixes:
     linkml: https://w3id.org/linkml/
-    dprc: https://ce-rise-models.codeberg.page/dpp-record-custody/
+    dprc: https://ce-rise-models.codeberg.page/dp-record-custody/
     prov: http://www.w3.org/ns/prov#
     dcterms: http://purl.org/dc/terms/
     foaf: http://xmlns.com/foaf/0.1/
@@ -33,12 +33,12 @@ imports:
     - linkml:types
 
 classes:
-    DPPRecordCustody:
+    DPRecordCustody:
         description: >
-            Root class for the chain of custody and governance history of DPP records.
+            Root class for the chain of custody and governance history of DPP/DMP records.
             Full implementation includes all five stages: Custody Events, Custodian History,
             Transfer Records, Integrity Evidence, and Governance Actions.
-        class_uri: dprc:DPPRecordCustody
+        class_uri: dprc:DPRecordCustody
         attributes:
             custody_events:
                 description: Chronological list of all custody-related events
@@ -50,7 +50,7 @@ classes:
                     owl.filler: prov:hadActivity
                     references: "CIRPASS; ESPR"
             custodian_history:
-                description: Historical record of all custodians who have held the DPP record
+                description: Historical record of all custodians who have held the DPP/DMP record
                 multivalued: true
                 range: CustodianRecord
                 slot_uri: prov:hadDelegate
@@ -86,7 +86,7 @@ classes:
 
     CustodyEvent:
         description: >
-            A significant action or change in the DPP record's custody chain,
+            A significant action or change in the DPP/DMP record's custody chain,
             capturing who did what, when, and with what authority
         class_uri: prov:Activity
         attributes:
@@ -111,6 +111,13 @@ classes:
                 annotations:
                     sql_identifier: dprc_event_integrity
                     owl.filler: sec:proof
+            transformation_details:
+                description: Data-level transformation details linking passport records
+                range: RecordTransformationDetails
+                slot_uri: prov:wasDerivedFrom
+                annotations:
+                    sql_identifier: dprc_transformation_details
+                    owl.filler: dprc:transformation_details
 
     EventMetadata:
         description: Core identifying and descriptive information about a custody event
@@ -142,7 +149,7 @@ classes:
                     sql_identifier: dprc_event_timestamp
                     owl.filler: prov:atTime
                     references: "CIRPASS"
-                    comment: "Product traceability information including date and time"
+                    comment: "Product or material traceability information including date and time"
             event_description:
                 description: Human-readable description of what happened
                 range: string
@@ -300,11 +307,56 @@ classes:
                     sql_identifier: dprc_merkle_root
                     owl.filler: dprc:merkle_root
 
+    RecordTransformationDetails:
+        description: >
+            Data-level lineage details describing how one or more passport records
+            are derived, aggregated, or reconciled to produce another passport record.
+        class_uri: prov:Derivation
+        attributes:
+            inputs:
+                description: Source passport record identifiers used as inputs
+                multivalued: true
+                range: string
+                slot_uri: prov:used
+                annotations:
+                    sql_identifier: dprc_transformation_inputs
+                    owl.filler: prov:used
+            outputs:
+                description: Resulting passport record identifiers produced as outputs
+                multivalued: true
+                range: string
+                slot_uri: prov:generated
+                annotations:
+                    sql_identifier: dprc_transformation_outputs
+                    owl.filler: prov:generated
+            operation_type:
+                description: Type of data-level transformation
+                required: true
+                range: RecordTransformationTypeEnum
+                slot_uri: dcterms:type
+                annotations:
+                    sql_identifier: dprc_transformation_operation_type
+                    owl.filler: dcterms:type
+            operation_method:
+                description: Method used for the data-level transformation
+                range: RecordTransformationMethodEnum
+                slot_uri: dprc:operationMethod
+                annotations:
+                    sql_identifier: dprc_transformation_operation_method
+                    owl.filler: dprc:operation_method
+            operation_ref:
+                description: Reference to an external workflow, job, or process record
+                range: string
+                slot_uri: dcterms:source
+                annotations:
+                    sql_identifier: dprc_transformation_operation_ref
+                    owl.filler: dcterms:source
+
     # Stage 2: Custodian History Classes
 
     CustodianRecord:
         description: >
-            Record of a specific custodian's period of responsibility for the DPP record,
+            Record of a specific custodian's period of responsibility for the DPP/DMP record,
             including their identity, custody period, and responsibilities
         class_uri: prov:Delegation
         attributes:
@@ -589,7 +641,7 @@ classes:
                     sql_identifier: dprc_transfer_timestamp
                     owl.filler: prov:atTime
                     references: "CIRPASS"
-                    comment: "Product traceability information"
+                    comment: "Product or material traceability information"
             from_custodian:
                 description: Custodian transferring custody
                 required: true
@@ -686,7 +738,7 @@ classes:
     IntegrityEvidence:
         description: >
             Comprehensive cryptographic and external evidence maintaining
-            the integrity and authenticity of the DPP record
+            the integrity and authenticity of the DPP/DMP record
         class_uri: sec:Proof
         attributes:
             data_fingerprint:
@@ -714,7 +766,7 @@ classes:
                     owl.filler: vc:hasCredential
 
     DataFingerprint:
-        description: Cryptographic fingerprint of DPP data at a specific point
+        description: Cryptographic fingerprint of DPP/DMP data at a specific point
         class_uri: sec:Digest
         attributes:
             fingerprint_value:
@@ -879,7 +931,7 @@ classes:
     GovernanceActions:
         description: >
             Governance activities including validations, audits, and disposal
-            actions taken on the DPP record
+            actions taken on the DPP/DMP record
         class_uri: prov:Generation
         attributes:
             validation_records:
@@ -907,7 +959,7 @@ classes:
                     owl.filler: prov:qualifiedInvalidation
 
     ValidationRecord:
-        description: Record of a validation performed on the DPP data
+        description: Record of a validation performed on the DPP/DMP data
         class_uri: prov:Validation
         attributes:
             validation_id:
@@ -967,7 +1019,7 @@ classes:
                     owl.filler: dcterms:conformsTo
 
     AuditRecord:
-        description: Record of an audit performed on the DPP custody chain
+        description: Record of an audit performed on the DPP/DMP custody chain
         class_uri: prov:Revision
         attributes:
             audit_id:
@@ -1027,7 +1079,7 @@ classes:
                     owl.filler: dpv:hasComplianceStatus
 
     DisposalRecord:
-        description: Record of DPP data disposal when applicable
+        description: Record of DPP/DMP data disposal when applicable
         class_uri: prov:Invalidation
         attributes:
             disposal_authorization:
@@ -1090,11 +1142,14 @@ enums:
         description: Types of custody events that can occur
         permissible_values:
             CREATION:
-                description: Initial creation of the DPP record
+                description: Initial creation of the DPP/DMP record
                 meaning: prov:Create
             UPDATE:
-                description: Modification of DPP record content
+                description: Modification of DPP/DMP record content
                 meaning: prov:Modify
+            TRANSFORMATION:
+                description: Data-level transformation linking passport records
+                meaning: prov:Derivation
             TRANSFER:
                 description: Transfer of custody to another party
                 meaning: prov:Delegation
@@ -1119,6 +1174,38 @@ enums:
             MIGRATION:
                 description: Migration to new system or format
                 meaning: prov:Migration
+
+    RecordTransformationTypeEnum:
+        description: Types of data-level transformations between passport records
+        permissible_values:
+            DERIVED_FROM:
+                description: Record derived from one or more source records
+            AGGREGATED_FROM:
+                description: Record aggregated from multiple source records
+            MERGED_FROM:
+                description: Record merged from multiple source records
+            SPLIT_FROM:
+                description: Record split into multiple outputs
+            RECONCILED_WITH:
+                description: Record reconciled against other records
+            ENRICHED_WITH:
+                description: Record enriched using external or related records
+            VERSIONED_FROM:
+                description: Record versioned from a prior record
+            DISTILLED_FROM:
+                description: Record distilled or summarized from source records
+
+    RecordTransformationMethodEnum:
+        description: Methods used to perform data-level transformations
+        permissible_values:
+            RULE_BASED:
+                description: Rule-based transformation
+            MANUAL_CURATION:
+                description: Manual curation or editorial transformation
+            AUTOMATED_PIPELINE:
+                description: Automated pipeline transformation
+            EXTERNAL_SOURCE:
+                description: Transformation via external source or import
 
     ActorRoleEnum:
         description: Roles that actors can have in the custody chain

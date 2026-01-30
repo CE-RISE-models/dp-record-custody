@@ -1,14 +1,14 @@
-# CE-RISE DPP Record Custody
+# CE-RISE DP Record Custody
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17900533.svg)](https://doi.org/10.5281/zenodo.17900533) [![Schemas](https://img.shields.io/badge/Schema%20Files-LinkML%2C%20JSON%2C%20SHACL%2C%20OWL-32CD32)](https://ce-rise-models.codeberg.page/dpp-record-custody/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17900533.svg)](https://doi.org/10.5281/zenodo.17900533) [![Schemas](https://img.shields.io/badge/Schema%20Files-LinkML%2C%20JSON%2C%20SHACL%2C%20OWL-32CD32)](https://ce-rise-models.codeberg.page/dp-record-custody/)
 
-Repository for the CE-RISE DPP Record Custody data model, part of the DPP Metadata Layer in the Digital Product Passport architecture. This model represents the complete chain of custody and governance history of the DPP record itself, tracking who did what when. It captures custody events (creation, update, transfer, archival), identifies custodians, records authorized transfers, includes cryptographic integrity evidence, and maintains comprehensive governance records. The model ensures forensic-level auditability, accountability, and secure lifecycle governance of the DPP as an information object, complementing the structural metadata (dpp-record-metadata) and operational governance (dpp-access-and-governance). All five stages are now fully implemented with industry-standard authentication (OIDC, OAuth2, SAML, DIDs) and comprehensive ontology support.
+Repository for the CE-RISE DP Record Custody data model, part of the DP Metadata Layer for Digital Product Passports (DPP) and Digital Material Passports (DMP). This model represents the complete chain of custody and governance history of the DPP/DMP record itself, tracking who did what when. It captures custody events (creation, update, transfer, archival), identifies custodians, records authorized transfers, includes cryptographic integrity evidence, and maintains comprehensive governance records. The model ensures forensic-level auditability, accountability, and secure lifecycle governance of the DPP/DMP as information objects, complementing the structural metadata (dp-record-metadata) and operational governance (dp-access-and-governance). All five stages are now fully implemented with industry-standard authentication (OIDC, OAuth2, SAML, DIDs) and comprehensive ontology support.
 
 
 ---
 
 ## Data Model Structure
-This data model provides a comprehensive audit trail of who did what to DPP records and when, capturing the complete chain of custody from creation through archival or disposal. It ensures forensic-level traceability of all changes, transfers, and governance actions applied to DPP data throughout its lifecycle.
+This data model provides a comprehensive audit trail of who did what to DPP/DMP records and when, capturing the complete chain of custody from creation through archival or disposal. It ensures forensic-level traceability of all changes, transfers, and governance actions applied to DPP/DMP data throughout its lifecycle.
 
 ### Key Design Principles
 1. **Event-based tracking**: Every significant action is captured as a timestamped event
@@ -22,7 +22,7 @@ This data model provides a comprehensive audit trail of who did what to DPP reco
 ### Core Hierarchy
 
 ```
-DPPRecordCustody (root)
+DPRecordCustody (root)
 ├── 1. CustodyEvents (multivalued, chronological)
 │   ├── EventMetadata
 │   │   ├── EventID (unique identifier)
@@ -44,6 +44,12 @@ DPPRecordCustody (root)
 │       ├── HashAlgorithm (SHA-256, SHA-3, etc.)
 │       ├── DigitalSignature (optional)
 │       └── SignatureAlgorithm (if signed)
+│   └── RecordTransformationDetails (optional)
+│       ├── Inputs (source passport record IDs)
+│       ├── Outputs (result passport record IDs)
+│       ├── OperationType (derived_from, aggregated_from, merged_from, split_from, reconciled_with, enriched_with, versioned_from, distilled_from)
+│       ├── OperationMethod (rule_based, manual_curation, automated_pipeline, external_source)
+│       └── OperationRef (optional workflow/process reference)
 │
 ├── 2. CustodianHistory (multivalued)
 │   ├── CustodianIdentity
@@ -126,10 +132,11 @@ DPPRecordCustody (root)
 ### Workflow Sequence
 
 #### **Step 1: Custody Event Capture**
-Record every significant action on the DPP record:
+Record every significant action on the DPP/DMP record:
 - **EventMetadata**: Unique ID, type, timestamp, description, justification
 - **EventActor**: Who performed the action with OIDC/OAuth2 authentication, JWT session tracking
 - **EventIntegrity**: Cryptographic chain linking with hashes and optional signatures
+- **RecordTransformationDetails**: Optional data-level lineage details linking related passport records
 
 #### **Step 2: Custodian Management**
 Track all parties who have had custody of the data:
@@ -166,7 +173,7 @@ Every data point includes a `sql_identifier` annotation following the pattern:
 **Pattern**: `dprc_[category]_[specific_name]`
 
 **Features:**
-- **DPP Record Custody Prefix**: All identifiers start with `dprc_`
+- **DP Record Custody Prefix**: All identifiers start with `dprc_`
 - **Hierarchical Namespacing**: Category prefixes (`event_`, `custodian_`, `transfer_`, `integrity_`, `governance_`)
 - **Database-Friendly**: Uses underscores, avoids special characters
 - **Unique Across Model**: No duplicate identifiers
@@ -234,7 +241,7 @@ Every data point includes a `sql_identifier` annotation following the pattern:
 Release artifacts for each version (`schema.json`, `shacl.ttl`, `model.owl`)  
 are served directly from this URL:
 ```
-https://ce-rise-models.codeberg.page/dpp-record-custody/
+https://ce-rise-models.codeberg.page/dp-record-custody/
 ```
 
 
@@ -245,7 +252,7 @@ https://ce-rise-models.codeberg.page/dpp-record-custody/
 If you want to view the files published for version `v1.2.0`, open:
 
 ```
-https://codeberg.org/CE-RISE-models/dpp-record-custody/src/tag/pages-v1.2.0/generated/
+https://codeberg.org/CE-RISE-models/dp-record-custody/src/tag/pages-v1.2.0/generated/
 ```
 
 Files available in that directory typically include:

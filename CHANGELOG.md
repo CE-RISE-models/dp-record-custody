@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to the CE-RISE DPP Record Custody Data Model will be documented in this file.
+All notable changes to the CE-RISE DP Record Custody Data Model will be documented in this file.
+
+## [0.0.3] - 2026-01-30
+
+### Added
+- Expand scope to include Digital Material Passports (DMPs) alongside Digital Product Passports (DPPs).
+- Add data-level passport record transformation details to custody events (inputs, outputs, operation type/method, operation reference).
 
 ## [0.0.2] - 2025-12-15
 
