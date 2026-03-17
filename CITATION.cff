@@ -1,7 +1,5 @@
 cff-version: 1.2.0
 title: CE-RISE DP Record Custody
-message: >-
-  v0.0.3 - Expanded scope to include Digital Material Passports (DMPs) alongside Digital Product Passports (DPPs).
 type: software
 doi: 10.5281/zenodo.17900533
 authors:
